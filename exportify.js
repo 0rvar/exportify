@@ -1,10 +1,10 @@
 window.Helpers = {
-  authorize: function() {
+  authorize: function () {
     var client_id = this.getQueryParam('app_client_id');
 
     // Use Exportify application client_id if none given
     if (client_id == '') {
-      client_id = "9950ac751e34487dbbe027c4fd7f8e99"
+      client_id = "7bd7656716f24be8bad1cddc972a7c6c"
     }
 
     window.location = "https://accounts.spotify.com/authorize" +
@@ -15,14 +15,14 @@ window.Helpers = {
   },
 
   // http://stackoverflow.com/a/901144/4167042
-  getQueryParam: function(name) {
+  getQueryParam: function (name) {
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-        results = regex.exec(location.search);
+      results = regex.exec(location.search);
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
   },
 
-  apiCall: function(url, access_token) {
+  apiCall: function (url, access_token) {
     return $.ajax({
       url: url,
       headers: {
@@ -34,6 +34,7 @@ window.Helpers = {
         window.location = window.location.href.split('#')[0]
       } else if (jqXHR.status == 429) {
         // API Rate-limiting encountered
+        // console.error('Rate limit')
         window.location = window.location.href.split('#')[0] + '?rate_limit_message=true'
       } else {
         // Otherwise report the error so user can raise an issue
@@ -44,7 +45,7 @@ window.Helpers = {
 }
 
 var PlaylistTable = React.createClass({
-  getInitialState: function() {
+  getInitialState: function () {
     return {
       playlists: [],
       playlistCount: 0,
@@ -53,11 +54,11 @@ var PlaylistTable = React.createClass({
     };
   },
 
-  loadPlaylists: function(url) {
+  loadPlaylists: function (url) {
     var userId = '';
     var firstPage = typeof url === 'undefined' || url.indexOf('offset=0') > -1;
 
-    window.Helpers.apiCall("https://api.spotify.com/v1/me", this.props.access_token).then(function(response) {
+    window.Helpers.apiCall("https://api.spotify.com/v1/me", this.props.access_token).then(function (response) {
       userId = response.id;
 
       // Show starred playlist if viewing first page
@@ -75,7 +76,7 @@ var PlaylistTable = React.createClass({
       } else {
         return window.Helpers.apiCall(url, this.props.access_token);
       }
-    }.bind(this)).done(function() {
+    }.bind(this)).done(function () {
       var response;
       var playlists = [];
 
@@ -101,38 +102,38 @@ var PlaylistTable = React.createClass({
     }.bind(this))
   },
 
-  exportPlaylists: function() {
+  exportPlaylists: function () {
     PlaylistsExporter.export(this.props.access_token, this.state.playlistCount);
   },
 
-  componentDidMount: function() {
+  componentDidMount: function () {
     this.loadPlaylists(this.props.url);
   },
 
-  render: function() {
+  render: function () {
     if (this.state.playlists.length > 0) {
       return (
         <div id="playlists">
-          <Paginator nextURL={this.state.nextURL} prevURL={this.state.prevURL} loadPlaylists={this.loadPlaylists}/>
+          <Paginator nextURL={this.state.nextURL} prevURL={this.state.prevURL} loadPlaylists={this.loadPlaylists} />
           <table className="table table-hover">
             <thead>
               <tr>
-                <th style={{width: "30px"}}></th>
+                <th style={{ width: "30px" }}></th>
                 <th>Name</th>
-                <th style={{width: "150px"}}>Owner</th>
-                <th style={{width: "100px"}}>Tracks</th>
-                <th style={{width: "120px"}}>Public?</th>
-                <th style={{width: "120px"}}>Collaborative?</th>
-                <th style={{width: "100px"}} className="text-right"><button className="btn btn-default btn-xs" type="submit" onClick={this.exportPlaylists}><span className="fa fa-file-archive-o"></span> Export All</button></th>
+                <th style={{ width: "150px" }}>Owner</th>
+                <th style={{ width: "100px" }}>Tracks</th>
+                <th style={{ width: "120px" }}>Public?</th>
+                <th style={{ width: "120px" }}>Collaborative?</th>
+                <th style={{ width: "100px" }} className="text-right"><button className="btn btn-default btn-xs" type="submit" onClick={this.exportPlaylists}><span className="fa fa-file-archive-o"></span> Export All</button></th>
               </tr>
             </thead>
             <tbody>
-              {this.state.playlists.map(function(playlist, i) {
-                return <PlaylistRow playlist={playlist} key={playlist.id} access_token={this.props.access_token}/>;
+              {this.state.playlists.map(function (playlist, i) {
+                return <PlaylistRow playlist={playlist} key={playlist.id} access_token={this.props.access_token} />;
               }.bind(this))}
             </tbody>
           </table>
-          <Paginator nextURL={this.state.nextURL} prevURL={this.state.prevURL} loadPlaylists={this.loadPlaylists}/>
+          <Paginator nextURL={this.state.nextURL} prevURL={this.state.prevURL} loadPlaylists={this.loadPlaylists} />
         </div>
       );
     } else {
@@ -142,11 +143,11 @@ var PlaylistTable = React.createClass({
 });
 
 var PlaylistRow = React.createClass({
-  exportPlaylist: function() {
+  exportPlaylist: function () {
     PlaylistExporter.export(this.props.access_token, this.props.playlist);
   },
 
-  renderTickCross: function(condition) {
+  renderTickCross: function (condition) {
     if (condition) {
       return <i className="fa fa-lg fa-check-circle-o"></i>
     } else {
@@ -154,7 +155,7 @@ var PlaylistRow = React.createClass({
     }
   },
 
-  renderIcon: function(playlist) {
+  renderIcon: function (playlist) {
     if (playlist.name == 'Starred') {
       return <i className="glyphicon glyphicon-star" style={{ color: 'gold' }}></i>;
     } else {
@@ -162,9 +163,9 @@ var PlaylistRow = React.createClass({
     }
   },
 
-  render: function() {
+  render: function () {
     playlist = this.props.playlist
-    if(playlist.uri==null) return (
+    if (playlist.uri == null) return (
       <tr key={this.props.key}>
         <td>{this.renderIcon(playlist)}</td>
         <td>{playlist.name}</td>
@@ -189,7 +190,7 @@ var PlaylistRow = React.createClass({
 });
 
 var Paginator = React.createClass({
-  nextClick: function(e) {
+  nextClick: function (e) {
     e.preventDefault()
 
     if (this.props.nextURL != null) {
@@ -197,7 +198,7 @@ var Paginator = React.createClass({
     }
   },
 
-  prevClick: function(e) {
+  prevClick: function (e) {
     e.preventDefault()
 
     if (this.props.prevURL != null) {
@@ -205,7 +206,7 @@ var Paginator = React.createClass({
     }
   },
 
-  render: function() {
+  render: function () {
     if (this.props.nextURL != null || this.props.prevURL != null) {
       return (
         <nav className="paginator text-right">
@@ -231,10 +232,10 @@ var Paginator = React.createClass({
 
 // Handles exporting all playlist data as a zip file
 var PlaylistsExporter = {
-  export: function(access_token, playlistCount) {
+  export: function (access_token, playlistCount) {
     var playlistFileNames = [];
 
-    window.Helpers.apiCall("https://api.spotify.com/v1/me", access_token).then(function(response) {
+    window.Helpers.apiCall("https://api.spotify.com/v1/me", access_token).then(function (response) {
       var limit = 20;
       var userId = response.id;
 
@@ -254,13 +255,13 @@ var PlaylistsExporter = {
         )
       }
 
-      $.when.apply($, requests).then(function() {
+      $.when.apply($, requests).then(function () {
         var playlists = [];
         var playlistExports = [];
 
         // Handle either single or multiple responses
         if (typeof arguments[0].href == 'undefined') {
-          $(arguments).each(function(i, response) {
+          $(arguments).each(function (i, response) {
             if (typeof response[0].items === 'undefined') {
               // Single playlist
               playlists.push(response[0]);
@@ -273,17 +274,34 @@ var PlaylistsExporter = {
           playlists = arguments[0].items
         }
 
-        $(playlists).each(function(i, playlist) {
-          playlistFileNames.push(PlaylistExporter.fileName(playlist));
-          playlistExports.push(PlaylistExporter.csvData(access_token, playlist));
-        });
+        console.log('Fetching', playlists.length, 'playlists')
 
-        return $.when.apply($, playlistExports);
-      }).then(function() {
+        var visit = function (playlistTail) {
+          console.log(playlistTail.length, 'to go')
+          if (playlistTail.length == 0) {
+            return $.when()
+          }
+          playlistFileNames.push(PlaylistExporter.fileName(playlistTail[0]));
+          const result = PlaylistExporter.csvData(access_token, playlistTail[0])
+          if (!result) {
+            return visit(playlistTail.slice(1))
+          }
+          return result.then((response) => {
+            var d = $.Deferred();
+            setTimeout(function () {
+              visit(playlistTail.slice(1)).then((responses) => {
+                d.resolve([response].concat(responses))
+              })
+            }, 250);
+            return d.promise();
+          })
+        }
+        return visit(playlists)
+      }).then(function (responses) {
+        console.log('complete! count:', responses.length)
         var zip = new JSZip();
-        var responses = [];
 
-        $(arguments).each(function(i, response) {
+        $(responses).each(function (i, response) {
           zip.file(playlistFileNames[i], response)
         });
 
@@ -296,16 +314,21 @@ var PlaylistsExporter = {
 
 // Handles exporting a single playlist as a CSV file
 var PlaylistExporter = {
-  export: function(access_token, playlist) {
-    this.csvData(access_token, playlist).then(function(data) {
+  export: function (access_token, playlist) {
+    this.csvData(access_token, playlist).then(function (data) {
       var blob = new Blob(["\uFEFF" + data], { type: "text/csv;charset=utf-8" });
       saveAs(blob, this.fileName(playlist));
     }.bind(this))
   },
 
-  csvData: function(access_token, playlist) {
+  csvData: function (access_token, playlist) {
     var requests = [];
     var limit = 100;
+
+    if (!playlist.tracks) {
+      console.log('Skipping', playlist.name);
+      return;
+    }
 
     for (var offset = 0; offset < playlist.tracks.total; offset = offset + limit) {
       requests.push(
@@ -313,36 +336,36 @@ var PlaylistExporter = {
       )
     }
 
-    return $.when.apply($, requests).then(function() {
+    return $.when.apply($, requests).then(function () {
       var responses = [];
 
       // Handle either single or multiple responses
       if (typeof arguments[0] != 'undefined') {
         if (typeof arguments[0].href == 'undefined') {
-          responses = Array.prototype.slice.call(arguments).map(function(a) { return a[0] });
+          responses = Array.prototype.slice.call(arguments).map(function (a) { return a[0] });
         } else {
           responses = [arguments[0]];
         }
       }
 
-      var tracks = responses.map(function(response) {
-        return response.items.map(function(item) {
+      var tracks = responses.map(function (response) {
+        return response.items.map(function (item) {
           return [
             item.track.uri,
             item.track.name,
-            item.track.artists.map(function(artist) { return artist.name }).join(', '),
+            item.track.artists.map(function (artist) { return artist.name }).join(', '),
             item.track.album.name,
             item.track.disc_number,
             item.track.track_number,
             item.track.duration_ms,
             item.added_by == null ? '' : item.added_by.uri,
             item.added_at
-          ].map(function(track) { return '"' + track + '"'; })
+          ].map(function (track) { return '"' + track + '"'; })
         });
       });
 
       // Flatten the array of pages
-      tracks = $.map(tracks, function(n) { return n })
+      tracks = $.map(tracks, function (n) { return n })
 
       tracks.unshift([
         "Spotify URI",
@@ -357,24 +380,24 @@ var PlaylistExporter = {
       ]);
 
       csvContent = '';
-      tracks.forEach(function(infoArray, index){
+      tracks.forEach(function (infoArray, index) {
         dataString = infoArray.join(",");
-        csvContent += index < tracks.length ? dataString+ "\n" : dataString;
+        csvContent += index < tracks.length ? dataString + "\n" : dataString;
       });
 
       return csvContent;
     });
   },
 
-  fileName: function(playlist) {
+  fileName: function (playlist) {
     return playlist.name.replace(/[^a-z0-9\- ]/gi, '').replace(/[ ]/gi, '_').toLowerCase() + ".csv";
   }
 }
 
-$(function() {
+$(function () {
   var vars = window.location.hash.substring(1).split('&');
   var key = {};
-  for (i=0; i<vars.length; i++) {
+  for (i = 0; i < vars.length; i++) {
     var tmp = vars[i].split('=');
     key[tmp[0]] = tmp[1];
   }
